@@ -4,10 +4,6 @@ import { TCategory } from './category.types';
 const CategorySchema = new Schema<TCategory>(
   {
     name: { type: String, required: true, unique: true },
-    description: {
-      type: String,
-      required: true,
-    },
   },
   { timestamps: true }
 );
