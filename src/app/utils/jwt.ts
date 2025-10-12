@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import jwt, { SignOptions } from 'jsonwebtoken';
+import { Types } from 'mongoose';
 
 const createJwtToken = (
-  jwtPayload: { userId: string; role: string },
+  jwtPayload: { userId: Types.ObjectId; role: string },
   jwtSecret: string,
   expiresIn: string
 ) => {
@@ -13,4 +15,13 @@ const createJwtToken = (
   return token;
 };
 
-export default createJwtToken;
+const verifyJwtToken = (token: string, jwtSecret: string) => {
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+    return decoded;
+  } catch (error: any) {
+    throw new Error(error?.message);
+  }
+};
+
+export { createJwtToken, verifyJwtToken };
