@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# UI/UX Designer Portfolio - Frontend
+
+This is the frontend application for the UI/UX Designer Portfolio marketplace, built with Next.js, TypeScript, Tailwind CSS, Redux, and shadcn/ui.
+
+## Features
+
+- 🎨 **Modern UI**: Beautiful, responsive design using Tailwind CSS and shadcn/ui components
+- 🔐 **Authentication**: Secure login and signup with JWT tokens
+- 🛍️ **Design Marketplace**: Browse, search, and purchase premium UI/UX designs
+- 💳 **Pricing Plans**: Multiple subscription tiers with detailed features
+- 📱 **Responsive**: Works seamlessly on desktop, tablet, and mobile devices
+- ⚡ **Dynamic URLs**: Centralized URL configuration for easy API endpoint management
+- 🔄 **State Management**: Redux Toolkit for efficient global state management
+- 🎯 **Type-Safe**: Full TypeScript support for better development experience
+
+## Dynamic URL Configuration
+
+The application uses a centralized URL configuration system. Change the API URL once in `.env.local` and it updates everywhere:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+All API endpoints are dynamically constructed from this base URL in `lib/config.ts`.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ installed
+- Backend API running (see root README.md)
+
+### Installation
+
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Create a `.env.local` file:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Run the development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Learn More
+### Build for Production
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+npm start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+client/
+├── app/                    # Next.js app router pages
+│   ├── auth/              # Authentication pages
+│   ├── designs/           # Design listing and detail pages
+│   ├── pricing/           # Pricing plans page
+│   ├── dashboard/         # User dashboard
+│   └── layout.tsx         # Root layout
+├── components/            # React components
+│   ├── ui/               # shadcn/ui components
+│   ├── layout/           # Layout components (Navbar, Footer)
+│   ├── design/           # Design-specific components
+│   └── providers/        # Context providers
+├── lib/                   # Utility functions and configurations
+│   ├── api/              # API client functions
+│   ├── config.ts         # Dynamic URL configuration
+│   └── utils/            # Helper functions
+├── store/                 # Redux store
+│   ├── slices/           # Redux slices
+│   └── hooks.ts          # Redux hooks
+└── types/                 # TypeScript type definitions
+```
 
-## Deploy on Vercel
+## Available Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **UI Components**: shadcn/ui
+- **State Management**: Redux Toolkit
+- **HTTP Client**: Axios
+- **Icons**: Lucide React
+- **Form Validation**: React Hook Form + Zod
+
+## API Integration
+
+The frontend communicates with the backend API running on port 3000. All API routes are defined in `lib/config.ts`:
+
+- Authentication endpoints
+- Design CRUD operations
+- Pricing plan management
+- Purchase workflows
+- User profile management
+
+## Authentication Flow
+
+1. User signs up → Receives verification email
+2. User verifies email → Account activated
+3. User logs in → Receives JWT access token
+4. Token stored in localStorage
+5. Token automatically included in all API requests
+6. Auto-refresh on token expiration
+
+## License
+
+This project is part of the UI/UX Designer Portfolio application.
