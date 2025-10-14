@@ -1,6 +1,8 @@
+export type TPricingPlanName = 'Basic' | 'Standard' | 'Premium';
+
 export type TPricingPlan = {
-  name: string;
+  name: TPricingPlanName;
   price: number;
   features: string[];
-  duration: string;
+  duration: number;
 };

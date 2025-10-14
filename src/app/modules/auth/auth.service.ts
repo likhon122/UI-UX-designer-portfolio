@@ -10,6 +10,7 @@ import { Response } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import sendEmail from '../../utils/sendEmail';
 import { createJwtToken, verifyJwtToken } from '../../utils/jwt';
+import mongoose from 'mongoose';
 
 const loginHandler = async (payload: { email: string; password: string }) => {
   const { email, password } = payload;
@@ -53,6 +54,19 @@ const signUpHandler = async (payload: TSignUp) => {
   const userExists = await User.findOne({
     email: payload.email,
   });
+
+  if (payload.phone) {
+    const customerExists = await Customer.findOne({
+      phone: payload.phone,
+    });
+    if (customerExists) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Customer is already registered with this phone number.'
+      );
+    }
+  }
+
   if (userExists) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
@@ -103,54 +117,72 @@ const registerUserHandler = async (payload: { token: string }) => {
     role: 'customer',
   };
 
-  const user = await User.create({
-    ...userData,
-  });
+  // Make session for Transaction
+  const session = await mongoose.startSession();
 
-  if (!user) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user.');
-  }
+  try {
+    // Start Transaction
+    session.startTransaction();
+    const user = new User({
+      ...userData,
+    });
 
-  // Crate customer profile
-  const customerProfile = {
-    user: user._id,
-    name: signUpData.name,
-    phone: signUpData?.phone,
-    address: signUpData?.address,
-    profileImage: signUpData?.profileImage,
-  };
+    await user.save({ session });
 
-  const customer = await Customer.create(customerProfile);
+    if (!user) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user.');
+    }
 
-  if (!customer) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      'Failed to create customer profile.'
+    // Crate customer profile
+    const customerProfile = {
+      user: user._id,
+      name: signUpData.name,
+      phone: signUpData?.phone,
+      address: signUpData?.address,
+      profileImage: signUpData?.profileImage,
+    };
+
+    const customer = new Customer(customerProfile);
+    await customer.save({ session });
+
+    if (!customer) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Failed to create customer profile.'
+      );
+    }
+
+    const jwtPayload = {
+      userId: user._id,
+      role: user.role,
+    };
+
+    // Now automatically logged in the user.
+    const accessToken = createJwtToken(
+      jwtPayload,
+      ENV.jwtSecret,
+      ENV.accessTokenExpiresIn
     );
+    const refreshToken = createJwtToken(
+      jwtPayload,
+      ENV.jwtSecret,
+      ENV.refreshTokenExpiresIn
+    );
+
+    const userWithoutPassword = { ...user.toObject(), password: undefined };
+    // Transaction is successful and commit the transaction
+    await session.commitTransaction();
+    await session.endSession();
+    return { user: userWithoutPassword, customer, accessToken, refreshToken };
+  } catch (error) {
+    // Rollback the transaction
+    await session.abortTransaction();
+    await session.endSession();
+    throw error;
   }
-
-  const jwtPayload = {
-    userId: user._id,
-    role: user.role,
-  };
-
-  // Now automatically logged in the user.
-  const accessToken = createJwtToken(
-    jwtPayload,
-    ENV.jwtSecret,
-    ENV.accessTokenExpiresIn
-  );
-  const refreshToken = createJwtToken(
-    jwtPayload,
-    ENV.jwtSecret,
-    ENV.refreshTokenExpiresIn
-  );
-
-  const userWithoutPassword = { ...user.toObject(), password: undefined };
-  return { user: userWithoutPassword, customer, accessToken, refreshToken };
 };
 
-const changePasswordHandler = async (payload: { email: string }) => {
+const forgetPasswordHandler = async (payload: { email: string }) => {
   const { email } = payload;
   const userExists = await User.findOne({
     email: email,
@@ -181,7 +213,7 @@ const changePasswordHandler = async (payload: { email: string }) => {
 };
 
 const resetPasswordHandler = async (
-  payload: { newPassword: string },
+  payload: { changedPassword: string },
   token: string | undefined
 ) => {
   // Verify token
@@ -206,8 +238,32 @@ const resetPasswordHandler = async (
     );
   }
 
-  user.password = payload.newPassword;
+  user.password = payload.changedPassword;
   await user.save();
+  return true;
+};
+
+const changePasswordHandler = async (
+  payload: { currentPassword: string; newPassword: string },
+  userId: string
+) => {
+  const existingUser = await User.findById(userId).select('+password');
+  if (!existingUser || !existingUser.password) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+  const isPasswordMatched = await comparePassword(
+    payload.currentPassword,
+    existingUser.password
+  );
+  if (!isPasswordMatched) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      'Current password is incorrect. Please enter the correct password.'
+    );
+  }
+
+  existingUser.password = payload.newPassword;
+  await existingUser.save();
   return true;
 };
 
@@ -275,8 +331,9 @@ export {
   loginHandler,
   signUpHandler,
   registerUserHandler,
-  changePasswordHandler,
+  forgetPasswordHandler,
   resetPasswordHandler,
+  changePasswordHandler,
   getAccessTokenHandler,
   logOutHandler,
 };
