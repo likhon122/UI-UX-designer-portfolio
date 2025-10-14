@@ -5,21 +5,29 @@ const customerSchema = new Schema<TCustomer>(
   {
     user: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'user',
       required: true,
     },
-    phone: String,
-    address: String,
+    name: { type: String, required: true },
+    phone: {
+      type: String,
+      unique: true,
+      default: '',
+    },
+    address: {
+      type: String,
+      default: '',
+    },
     membership: {
       type: String,
-      enum: ['Basic', 'Premium', 'VIP'],
-      default: 'Basic',
+      enum: ['Free', 'Basic', 'Standard', 'Premium'],
+      default: 'Free',
     },
     totalSpent: {
       type: Number,
       default: 0,
     },
-    profileImage: { type: String },
+    profileImage: { type: String, default: '' },
   },
   { timestamps: true }
 );

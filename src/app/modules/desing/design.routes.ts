@@ -11,11 +11,13 @@ import {
   createDesignSchemaValidation,
   updateDesignSchemaValidation,
 } from './desing.validation';
+import auth from '../../middlewares/auth';
 
 const designRoutes = Router();
 
 designRoutes.post(
   '/',
+  auth('admin', 'superAdmin'),
   validateRequest(createDesignSchemaValidation),
   createDesign
 );
@@ -25,11 +27,11 @@ designRoutes.get('/', getAllDesign);
 
 designRoutes.patch(
   '/:id',
+  auth('admin', 'superAdmin'),
   validateRequest(updateDesignSchemaValidation),
   updateDesign
 );
 
-designRoutes.delete('/:id', deleteDesign);
-
+designRoutes.delete('/:id', auth('admin', 'superAdmin'), deleteDesign);
 
 export default designRoutes;

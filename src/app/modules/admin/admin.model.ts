@@ -8,6 +8,15 @@ const adminSchema = new Schema<TAdmin>(
       required: [true, 'Name is required'],
       trim: true,
     },
+    phone: {
+      type: String,
+      unique: true,
+      default: '',
+    },
+    address: {
+      type: String,
+      default: '',
+    },
     user: {
       type: Schema.Types.ObjectId,
       ref: 'user',
@@ -15,9 +24,10 @@ const adminSchema = new Schema<TAdmin>(
     },
     position: {
       type: String,
+      enum: ['Administrator', 'Manager'],
       default: 'Administrator',
     },
-    profileImage: { type: String },
+    profileImage: { type: String, default: '' },
   },
   { timestamps: true }
 );

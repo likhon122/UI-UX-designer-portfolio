@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import {
   changePassword,
+  forgetPassword,
   getAccessToken,
   login,
   logout,
@@ -11,6 +12,7 @@ import {
 import validateRequest from '../../middlewares/validateRequest';
 import {
   changePasswordSchemaValidation,
+  forgotPasswordSchemaValidation,
   loginSchemaValidation,
   registerUserSchemaValidation,
   resetPasswordSchemaValidation,
@@ -48,12 +50,12 @@ authRoutes.post(
 );
 
 authRoutes.post(
-  '/change-password',
+  '/forget-password',
   (req: Request, res: Response, next: NextFunction) => {
     isAlreadyLoggedIn(req, res, next);
   },
-  validateRequest(changePasswordSchemaValidation),
-  changePassword
+  validateRequest(forgotPasswordSchemaValidation),
+  forgetPassword
 );
 
 authRoutes.post(
@@ -63,6 +65,13 @@ authRoutes.post(
   },
   validateRequest(resetPasswordSchemaValidation),
   resetPassword
+);
+
+authRoutes.patch(
+  '/change-password',
+  auth('admin', 'customer'),
+  validateRequest(changePasswordSchemaValidation),
+  changePassword
 );
 
 authRoutes.get(

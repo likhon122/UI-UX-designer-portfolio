@@ -3,6 +3,7 @@ import catchAsync from '../../utils/catchAsync';
 import { successResponse } from '../../utils/response';
 import {
   changePasswordHandler,
+  forgetPasswordHandler,
   getAccessTokenHandler,
   loginHandler,
   logOutHandler,
@@ -70,8 +71,8 @@ const registerUser = catchAsync(async (req, res) => {
   });
 });
 
-const changePassword = catchAsync(async (req, res) => {
-  const token = await changePasswordHandler(req.body);
+const forgetPassword = catchAsync(async (req, res) => {
+  const token = await forgetPasswordHandler(req.body);
   return successResponse(res, {
     success: true,
     message: 'Password reset link has been sent to your email.',
@@ -87,7 +88,19 @@ const resetPassword = catchAsync(async (req, res) => {
 
   return successResponse(res, {
     success: true,
-    message: 'Reset password functionality is not implemented yet.',
+    message: 'Password reset successfully.',
+    statusCode: 200,
+    data: {},
+  });
+});
+
+const changePassword = catchAsync(async (req, res) => {
+  const userId = req.user.userId;
+  await changePasswordHandler(req.body, userId);
+
+  return successResponse(res, {
+    success: true,
+    message: 'Password changed successfully.',
     statusCode: 200,
     data: {},
   });
@@ -117,8 +130,9 @@ export {
   login,
   signUp,
   registerUser,
-  changePassword,
+  forgetPassword,
   resetPassword,
+  changePassword,
   getAccessToken,
   logout,
 };

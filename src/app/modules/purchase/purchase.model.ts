@@ -3,11 +3,11 @@ import { TPurchase } from './purchase.types';
 
 const PurchaseSchema = new Schema<TPurchase>(
   {
-    customer: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    design: { type: Schema.Types.ObjectId, ref: 'Design', required: true },
+    customer: { type: Schema.Types.ObjectId, ref: 'user', required: true },
+    design: { type: Schema.Types.ObjectId, ref: 'design', required: true },
     pricingPlan: {
       type: Schema.Types.ObjectId,
-      ref: 'PricingPlan',
+      ref: 'pricing-plan',
       required: true,
     },
     paymentStatus: {
