@@ -1,4 +1,76 @@
-# UI/UX Designer Portfolio API Documentation
+# UI/UX Designer Portfolio - Full Stack Application
+
+A complete full-stack application for a UI/UX designer portfolio and e-commerce platform.
+
+## 🚀 Quick Start
+
+### Backend (Express.js API)
+
+```bash
+# Install dependencies
+npm install
+
+# Create .env file (see below)
+
+# Run in development
+npm run dev
+```
+
+### Frontend (Next.js)
+
+```bash
+# Navigate to frontend
+cd frontend
+
+# Install dependencies
+npm install
+
+# Create .env.local with:
+# NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
+
+# Run in development
+npm run dev
+```
+
+**Open**: http://localhost:3000 (or the port shown in terminal)
+
+## 📚 Documentation
+
+- **Complete Setup Guide**: See [FRONTEND_GUIDE.md](./FRONTEND_GUIDE.md)
+- **Backend API Reference**: See below
+- **Frontend Documentation**: See [frontend/README.md](./frontend/README.md)
+
+## ✨ Features
+
+- 🎨 Professional UI/UX Design Gallery
+- 🔐 Complete Authentication System (JWT-based)
+- 🛍️ E-commerce Purchase Flow
+- 👥 Role-based Access (Customer, Admin, SuperAdmin)
+- 🌓 Dark/Light Theme Toggle
+- 📱 Fully Responsive Design
+- 🔄 Redux State Management
+- 🎯 Dynamic API Configuration
+- 📊 Admin Dashboard with Analytics
+
+## 🛠️ Tech Stack
+
+**Frontend:**
+- Next.js 15 (App Router)
+- TypeScript
+- Tailwind CSS v4
+- Redux Toolkit
+- ShadCN UI Components
+
+**Backend:**
+- Express.js
+- TypeScript
+- MongoDB + Mongoose
+- JWT Authentication
+- Zod Validation
+
+---
+
+# Backend API Documentation
 
 Complete API documentation for the UI/UX Designer Portfolio application.
 
