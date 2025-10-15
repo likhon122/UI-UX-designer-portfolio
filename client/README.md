@@ -1,73 +1,143 @@
-# React + TypeScript + Vite
+# UI/UX Designer Portfolio - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive React application for a UI/UX designer portfolio and design marketplace.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Authentication System**: Complete user authentication with login, signup, and email verification
+- **Dynamic API Configuration**: Centralized API base URL that can be changed in one place
+- **Theme Toggle**: Switch between light and dark modes
+- **Protected Routes**: Role-based access control (customer, admin, superAdmin)
+- **Design Gallery**: Browse and search through design collections
+- **Responsive Design**: Mobile-first approach with Tailwind CSS
+- **State Management**: Redux Toolkit for efficient state management
+- **Type Safety**: Full TypeScript support
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React 18** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool and dev server
+- **Tailwind CSS** - Utility-first CSS framework
+- **Redux Toolkit** - State management
+- **React Router** - Client-side routing
+- **Axios** - HTTP client
+- **Lucide React** - Icon library
 
-## Expanding the ESLint configuration
+## 📦 Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. Navigate to the client directory:
+```bash
+cd client
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. Install dependencies:
+```bash
+npm install
 ```
+
+3. Create a `.env` file (copy from `.env.example`):
+```bash
+cp .env.example .env
+```
+
+4. Update the API base URL in `.env`:
+```env
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+## 🔧 Dynamic API Configuration
+
+The application uses a centralized API configuration that makes it easy to change the backend URL across the entire application.
+
+### How to Change the API URL
+
+**Option 1: Environment Variable (Recommended)**
+
+Edit the `.env` file in the client directory:
+```env
+VITE_API_BASE_URL=http://your-api-url.com
+```
+
+**Option 2: Configuration File**
+
+Edit `src/config/api.config.ts`:
+```typescript
+export const API_CONFIG = {
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+  // ... other config
+};
+```
+
+**Why This Works:**
+- All API calls use the centralized `apiClient` from `src/services/api.ts`
+- The `apiClient` reads from `API_CONFIG.API_URL`
+- Changing the base URL in one place updates it everywhere
+- No need to search and replace URLs throughout the codebase
+
+## 🏃‍♂️ Running the Application
+
+### Development Mode
+```bash
+npm run dev
+```
+The app will be available at `http://localhost:5173`
+
+### Production Build
+```bash
+npm run build
+```
+
+### Preview Production Build
+```bash
+npm run preview
+```
+
+## 🔐 Authentication Flow
+
+1. **Signup**: User registers with email, password, and optional details
+2. **Email Verification**: User receives verification email
+3. **Register User**: User clicks verification link to complete registration
+4. **Login**: User logs in with credentials
+5. **Token Management**: Access token stored in localStorage, refresh token in HTTP-only cookie
+6. **Auto Refresh**: Axios interceptor automatically refreshes expired tokens
+
+## 🎨 Theme System
+
+The application supports light and dark themes:
+
+- Toggle theme using the moon/sun icon in the navbar
+- Theme preference is saved in localStorage
+- Smooth transitions between themes
+- Consistent color palette using CSS custom properties
+
+## 🛡️ Protected Routes
+
+The application implements role-based access control:
+
+- **Public Routes**: Home, Designs, Login, Signup
+- **Customer Routes**: My Purchases, Profile
+- **Admin Routes**: Admin Dashboard, Manage Designs, Manage Categories
+- **Super Admin Routes**: All admin routes + manage admins
+
+If a user tries to access a protected route without authentication, they're redirected to the login page.
+
+## 📱 Responsive Design
+
+The application is fully responsive with breakpoints:
+- Mobile: < 640px
+- Tablet: 640px - 1024px
+- Desktop: > 1024px
+
+## 📝 Environment Variables
+
+Create a `.env` file with the following variables:
+
+```env
+# API Configuration
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+## 📄 License
+
+This project is part of the UI/UX Designer Portfolio application.
