@@ -74,7 +74,8 @@ export const fetchMyPurchases = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response: any = await apiClient.get(API_ENDPOINTS.PURCHASES.MY_PURCHASES);
-      return response.data;
+      // Ensure we return an array
+      return Array.isArray(response.data) ? response.data : [];
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch purchases');
     }
@@ -90,6 +91,13 @@ export const fetchAllPurchases = createAsyncThunk(
         url += `&paymentStatus=${paymentStatus}`;
       }
       const response: any = await apiClient.get(url);
+      // Handle both array and object with purchases property
+      if (Array.isArray(response.data)) {
+        return {
+          purchases: response.data,
+          pagination: { page, limit, total: response.data.length },
+        };
+      }
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch purchases');
@@ -166,11 +174,12 @@ const purchaseSlice = createSlice({
     });
     builder.addCase(fetchMyPurchases.fulfilled, (state, action) => {
       state.loading = false;
-      state.myPurchases = action.payload;
+      state.myPurchases = Array.isArray(action.payload) ? action.payload : [];
     });
     builder.addCase(fetchMyPurchases.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload as string;
+      state.myPurchases = [];
     });
 
     // Fetch all purchases
@@ -180,12 +189,13 @@ const purchaseSlice = createSlice({
     });
     builder.addCase(fetchAllPurchases.fulfilled, (state, action) => {
       state.loading = false;
-      state.purchases = action.payload.purchases;
-      state.pagination = action.payload.pagination;
+      state.purchases = action.payload.purchases || [];
+      state.pagination = action.payload.pagination || { page: 1, limit: 10, total: 0 };
     });
     builder.addCase(fetchAllPurchases.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload as string;
+      state.purchases = [];
     });
 
     // Fetch purchase by ID

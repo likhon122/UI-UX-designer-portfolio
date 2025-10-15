@@ -30,7 +30,8 @@ export const fetchPricingPlans = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response: any = await apiClient.get(API_ENDPOINTS.PRICING_PLANS.ALL);
-      return response.data;
+      // Ensure we return an array
+      return Array.isArray(response.data) ? response.data : [];
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch pricing plans');
     }
@@ -92,11 +93,12 @@ const pricingPlanSlice = createSlice({
     });
     builder.addCase(fetchPricingPlans.fulfilled, (state, action) => {
       state.loading = false;
-      state.pricingPlans = action.payload;
+      state.pricingPlans = Array.isArray(action.payload) ? action.payload : [];
     });
     builder.addCase(fetchPricingPlans.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload as string;
+      state.pricingPlans = [];
     });
 
     // Fetch pricing plan by ID
