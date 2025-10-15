@@ -19,7 +19,7 @@ export default function DesignDetailPage() {
   const dispatch = useAppDispatch();
   const id = params.id as string;
   
-  const { currentDesign: design, loading, error } = useAppSelector((state) => state.design);
+  const { currentDesign: design, loading, error: designError } = useAppSelector((state) => state.design);
   const { pricingPlans = [] } = useAppSelector((state) => state.pricingPlan);
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
@@ -52,20 +52,21 @@ export default function DesignDetailPage() {
     try {
       await dispatch(createPurchase({ design: id, pricingPlan: selectedPlan }));
       router.push('/customer/purchases');
-    } catch (error) {
+    } catch (purchaseError) {
+      console.error('Failed to create purchase:', purchaseError);
       alert('Failed to create purchase');
     } finally {
       setPurchasing(false);
     }
   };
 
-  if (error) {
+  if (designError) {
     return (
       <MainLayout>
         <div className="container px-4 py-12">
           <div className="text-center py-12 bg-destructive/10 rounded-lg max-w-2xl mx-auto">
             <p className="text-destructive font-semibold mb-2">Error loading design</p>
-            <p className="text-muted-foreground text-sm mb-4">{error}</p>
+            <p className="text-muted-foreground text-sm mb-4">{designError}</p>
             <div className="flex gap-4 justify-center">
               <Button onClick={() => dispatch(fetchDesignById(id))} variant="outline">
                 Try Again
