@@ -11,7 +11,7 @@ import Link from 'next/link';
 
 export default function PricingPage() {
   const dispatch = useAppDispatch();
-  const { pricingPlans, loading } = useAppSelector((state) => state.pricingPlan);
+  const { pricingPlans = [], loading, error } = useAppSelector((state) => state.pricingPlan);
 
   useEffect(() => {
     dispatch(fetchPricingPlans());
@@ -27,7 +27,17 @@ export default function PricingPage() {
           </p>
         </div>
 
-        {loading ? (
+        {error && (
+          <div className="text-center py-12 bg-destructive/10 rounded-lg max-w-2xl mx-auto">
+            <p className="text-destructive font-semibold mb-2">Error loading pricing plans</p>
+            <p className="text-muted-foreground text-sm mb-4">{error}</p>
+            <Button onClick={() => dispatch(fetchPricingPlans())} variant="outline">
+              Try Again
+            </Button>
+          </div>
+        )}
+
+        {!error && loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {[...Array(3)].map((_, i) => (
               <Card key={i} className="animate-pulse">
@@ -45,20 +55,20 @@ export default function PricingPage() {
               </Card>
             ))}
           </div>
-        ) : pricingPlans.length === 0 ? (
+        ) : !error && (!pricingPlans || pricingPlans.length === 0) ? (
           <div className="text-center py-20">
             <p className="text-muted-foreground">No pricing plans available</p>
           </div>
-        ) : (
+        ) : !error && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {pricingPlans.map((plan, index) => (
+            {pricingPlans && pricingPlans.map((plan, index) => (
               <Card
-                key={plan.id}
-                className={`relative ${
-                  plan.name === 'Standard' ? 'border-primary shadow-lg scale-105' : ''
+                key={plan?.id || index}
+                className={`relative transition-all duration-200 hover:shadow-xl ${
+                  plan?.name === 'Standard' ? 'border-primary shadow-lg scale-105' : ''
                 }`}
               >
-                {plan.name === 'Standard' && (
+                {plan?.name === 'Standard' && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                     <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold">
                       Most Popular
@@ -66,30 +76,34 @@ export default function PricingPage() {
                   </div>
                 )}
                 <CardHeader>
-                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                  <CardTitle className="text-2xl">{plan?.name || 'Plan'}</CardTitle>
                   <div className="mt-4">
-                    <span className="text-4xl font-bold">${plan.price}</span>
-                    <span className="text-muted-foreground"> / {plan.duration} days</span>
+                    <span className="text-4xl font-bold text-primary">${plan?.price || 0}</span>
+                    <span className="text-muted-foreground"> / {plan?.duration || 30} days</span>
                   </div>
                   <CardDescription>
-                    Perfect for {plan.name === 'Basic' ? 'individuals' : plan.name === 'Standard' ? 'small teams' : 'enterprises'}
+                    Perfect for {plan?.name === 'Basic' ? 'individuals' : plan?.name === 'Standard' ? 'small teams' : 'enterprises'}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-3">
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start">
-                        <Check className="h-5 w-5 text-primary mr-2 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
+                    {plan?.features && plan.features.length > 0 ? (
+                      plan.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-start">
+                          <Check className="h-5 w-5 text-primary mr-2 flex-shrink-0 mt-0.5" />
+                          <span className="text-sm">{feature}</span>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="text-sm text-muted-foreground">No features listed</li>
+                    )}
                   </ul>
                 </CardContent>
                 <CardFooter>
                   <Link href="/designs" className="w-full">
                     <Button
                       className="w-full"
-                      variant={plan.name === 'Standard' ? 'default' : 'outline'}
+                      variant={plan?.name === 'Standard' ? 'default' : 'outline'}
                     >
                       Get Started
                     </Button>

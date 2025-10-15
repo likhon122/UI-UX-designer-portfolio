@@ -19,8 +19,8 @@ export default function DesignDetailPage() {
   const dispatch = useAppDispatch();
   const id = params.id as string;
   
-  const { currentDesign: design, loading } = useAppSelector((state) => state.design);
-  const { pricingPlans } = useAppSelector((state) => state.pricingPlan);
+  const { currentDesign: design, loading, error: designError } = useAppSelector((state) => state.design);
+  const { pricingPlans = [] } = useAppSelector((state) => state.pricingPlan);
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [purchasing, setPurchasing] = useState(false);
@@ -52,12 +52,34 @@ export default function DesignDetailPage() {
     try {
       await dispatch(createPurchase({ design: id, pricingPlan: selectedPlan }));
       router.push('/customer/purchases');
-    } catch (error) {
+    } catch (purchaseError) {
+      console.error('Failed to create purchase:', purchaseError);
       alert('Failed to create purchase');
     } finally {
       setPurchasing(false);
     }
   };
+
+  if (designError) {
+    return (
+      <MainLayout>
+        <div className="container px-4 py-12">
+          <div className="text-center py-12 bg-destructive/10 rounded-lg max-w-2xl mx-auto">
+            <p className="text-destructive font-semibold mb-2">Error loading design</p>
+            <p className="text-muted-foreground text-sm mb-4">{designError}</p>
+            <div className="flex gap-4 justify-center">
+              <Button onClick={() => dispatch(fetchDesignById(id))} variant="outline">
+                Try Again
+              </Button>
+              <Link href="/designs">
+                <Button>Back to Designs</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   if (loading || !design) {
     return (
@@ -97,22 +119,22 @@ export default function DesignDetailPage() {
             <div>
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h1 className="text-4xl font-bold mb-2">{design.title}</h1>
+                  <h1 className="text-4xl font-bold mb-2">{design?.title || 'Untitled Design'}</h1>
                   <div className="flex items-center gap-2">
                     {category && (
                       <Badge variant="secondary">{category.name}</Badge>
                     )}
-                    <Badge variant="outline">{design.complexityLevel}</Badge>
-                    <Badge variant={design.status === 'Active' ? 'default' : 'secondary'}>
-                      {design.status}
+                    <Badge variant="outline">{design?.complexityLevel || 'Basic'}</Badge>
+                    <Badge variant={design?.status === 'Active' ? 'default' : 'secondary'}>
+                      {design?.status || 'Draft'}
                     </Badge>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-3xl font-bold">${design.price}</p>
+                  <p className="text-3xl font-bold text-primary">${design?.price || 0}</p>
                 </div>
               </div>
-              <p className="text-muted-foreground">{design.description}</p>
+              <p className="text-muted-foreground">{design?.description || 'No description available'}</p>
             </div>
 
             {/* Details */}
@@ -123,10 +145,10 @@ export default function DesignDetailPage() {
               <CardContent className="space-y-4">
                 <div>
                   <h3 className="font-semibold mb-2">Designer</h3>
-                  <p className="text-muted-foreground">{design.designerName}</p>
+                  <p className="text-muted-foreground">{design?.designerName || 'Unknown'}</p>
                 </div>
 
-                {design.usedTools && design.usedTools.length > 0 && (
+                {design?.usedTools && design.usedTools.length > 0 && (
                   <div>
                     <h3 className="font-semibold mb-2">Tools Used</h3>
                     <div className="flex flex-wrap gap-2">
@@ -137,7 +159,7 @@ export default function DesignDetailPage() {
                   </div>
                 )}
 
-                {design.effects && design.effects.length > 0 && (
+                {design?.effects && design.effects.length > 0 && (
                   <div>
                     <h3 className="font-semibold mb-2">Effects</h3>
                     <div className="flex flex-wrap gap-2">
@@ -148,7 +170,7 @@ export default function DesignDetailPage() {
                   </div>
                 )}
 
-                {design.tags && design.tags.length > 0 && (
+                {design?.tags && design.tags.length > 0 && (
                   <div>
                     <h3 className="font-semibold mb-2">Tags</h3>
                     <div className="flex flex-wrap gap-2">
@@ -159,10 +181,12 @@ export default function DesignDetailPage() {
                   </div>
                 )}
 
-                <div>
-                  <h3 className="font-semibold mb-2">Design Process</h3>
-                  <p className="text-muted-foreground whitespace-pre-wrap">{design.process}</p>
-                </div>
+                {design?.process && (
+                  <div>
+                    <h3 className="font-semibold mb-2">Design Process</h3>
+                    <p className="text-muted-foreground whitespace-pre-wrap">{design.process}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -177,34 +201,38 @@ export default function DesignDetailPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {pricingPlans.map((plan) => (
-                  <div
-                    key={plan.id}
-                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                      selectedPlan === plan.id
-                        ? 'border-primary bg-primary/5'
-                        : 'hover:border-primary/50'
-                    }`}
-                    onClick={() => setSelectedPlan(plan.id)}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-semibold">{plan.name}</h4>
-                      <p className="font-bold">${plan.price}</p>
+                {pricingPlans && pricingPlans.length > 0 ? (
+                  pricingPlans.map((plan) => (
+                    <div
+                      key={plan?.id}
+                      className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
+                        selectedPlan === plan?.id
+                          ? 'border-primary bg-primary/5 shadow-md'
+                          : 'hover:border-primary/50 hover:shadow-sm'
+                      }`}
+                      onClick={() => setSelectedPlan(plan?.id || null)}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-semibold">{plan?.name || 'Plan'}</h4>
+                        <p className="font-bold text-primary">${plan?.price || 0}</p>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {plan?.duration || 30} days access
+                      </p>
+                      {plan?.features && plan.features.length > 0 && (
+                        <ul className="text-sm space-y-1">
+                          {plan.features.map((feature, index) => (
+                            <li key={index} className="text-muted-foreground">
+                              • {feature}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {plan.duration} days access
-                    </p>
-                    {plan.features && plan.features.length > 0 && (
-                      <ul className="text-sm space-y-1">
-                        {plan.features.map((feature, index) => (
-                          <li key={index} className="text-muted-foreground">
-                            • {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">No pricing plans available</p>
+                )}
 
                 {isAuthenticated ? (
                   <Button

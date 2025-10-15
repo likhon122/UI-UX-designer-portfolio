@@ -61,32 +61,32 @@ export default function ProfilePage() {
             </p>
           </div>
 
-          <Card>
+          <Card className="shadow-lg border-2">
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="text-2xl">{user.name}</CardTitle>
+                  <CardTitle className="text-2xl">{user?.name || 'User'}</CardTitle>
                   <CardDescription className="mt-2">
-                    <Badge>{user.role}</Badge>
+                    <Badge variant="default" className="shadow-sm">{user?.role || 'customer'}</Badge>
                   </CardDescription>
                 </div>
-                <Button variant="outline">Edit Profile</Button>
+                <Button variant="outline" className="hover:shadow-md transition-shadow">Edit Profile</Button>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
-                    <Mail className="h-5 w-5 text-muted-foreground mt-0.5" />
+                    <Mail className="h-5 w-5 text-primary mt-0.5" />
                     <div>
                       <p className="text-sm text-muted-foreground">Email</p>
-                      <p className="font-medium">{user.email}</p>
+                      <p className="font-medium">{user?.email || 'N/A'}</p>
                     </div>
                   </div>
 
-                  {user.phone && (
+                  {user?.phone && (
                     <div className="flex items-start space-x-3">
-                      <Phone className="h-5 w-5 text-muted-foreground mt-0.5" />
+                      <Phone className="h-5 w-5 text-primary mt-0.5" />
                       <div>
                         <p className="text-sm text-muted-foreground">Phone</p>
                         <p className="font-medium">{user.phone}</p>
@@ -97,16 +97,16 @@ export default function ProfilePage() {
 
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
-                    <User className="h-5 w-5 text-muted-foreground mt-0.5" />
+                    <User className="h-5 w-5 text-primary mt-0.5" />
                     <div>
                       <p className="text-sm text-muted-foreground">User ID</p>
-                      <p className="font-medium text-xs">{user.id}</p>
+                      <p className="font-medium text-xs">{user?.id || 'N/A'}</p>
                     </div>
                   </div>
 
-                  {user.address && (
+                  {user?.address && (
                     <div className="flex items-start space-x-3">
-                      <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+                      <MapPin className="h-5 w-5 text-primary mt-0.5" />
                       <div>
                         <p className="text-sm text-muted-foreground">Address</p>
                         <p className="font-medium">{user.address}</p>
@@ -119,15 +119,15 @@ export default function ProfilePage() {
               <div className="pt-6 border-t space-y-4">
                 <h3 className="font-semibold">Account Actions</h3>
                 <div className="flex flex-wrap gap-3">
-                  <Button variant="outline">Change Password</Button>
-                  <Button variant="outline">Update Email</Button>
-                  {user.role === 'customer' && (
-                    <Button variant="outline" onClick={() => router.push('/customer/purchases')}>
+                  <Button variant="outline" className="hover:shadow-md transition-shadow">Change Password</Button>
+                  <Button variant="outline" className="hover:shadow-md transition-shadow">Update Email</Button>
+                  {user?.role === 'customer' && (
+                    <Button variant="outline" className="hover:shadow-md transition-shadow" onClick={() => router.push('/customer/purchases')}>
                       View Purchases
                     </Button>
                   )}
-                  {(user.role === 'admin' || user.role === 'superAdmin') && (
-                    <Button variant="outline" onClick={() => router.push('/admin/dashboard')}>
+                  {(user?.role === 'admin' || user?.role === 'superAdmin') && (
+                    <Button variant="outline" className="hover:shadow-md transition-shadow" onClick={() => router.push('/admin/dashboard')}>
                       Admin Dashboard
                     </Button>
                   )}

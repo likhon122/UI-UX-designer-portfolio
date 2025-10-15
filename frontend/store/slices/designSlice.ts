@@ -51,7 +51,16 @@ export const fetchDesigns = createAsyncThunk(
   async ({ page = 1, limit = 10 }: { page?: number; limit?: number }, { rejectWithValue }) => {
     try {
       const response: any = await apiClient.get(`${API_ENDPOINTS.DESIGNS.ALL}?page=${page}&limit=${limit}`);
-      return response.data;
+      // Backend returns array directly in data, not an object with designs property
+      const designs = Array.isArray(response.data) ? response.data : [];
+      return {
+        designs,
+        pagination: {
+          page,
+          limit,
+          total: designs.length,
+        },
+      };
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch designs');
     }
@@ -125,12 +134,13 @@ const designSlice = createSlice({
     });
     builder.addCase(fetchDesigns.fulfilled, (state, action) => {
       state.loading = false;
-      state.designs = action.payload.designs;
-      state.pagination = action.payload.pagination;
+      state.designs = action.payload.designs || [];
+      state.pagination = action.payload.pagination || { page: 1, limit: 10, total: 0 };
     });
     builder.addCase(fetchDesigns.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload as string;
+      state.designs = [];
     });
 
     // Fetch design by ID
