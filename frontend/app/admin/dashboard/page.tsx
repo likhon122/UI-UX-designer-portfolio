@@ -21,7 +21,7 @@ export default function AdminDashboardPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
-  const { revenue } = useAppSelector((state) => state.purchase);
+  const { revenue, loading, error } = useAppSelector((state) => state.purchase);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -79,45 +79,68 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Revenue Stats */}
-        {revenue && (
+        {error && (
+          <div className="text-center py-8 bg-destructive/10 rounded-lg mb-8">
+            <p className="text-destructive font-semibold mb-2">Error loading revenue data</p>
+            <p className="text-muted-foreground text-sm mb-4">{error}</p>
+            <Button onClick={() => dispatch(fetchRevenue())} variant="outline">
+              Try Again
+            </Button>
+          </div>
+        )}
+
+        {!error && loading && !revenue ? (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card>
+            {[...Array(4)].map((_, i) => (
+              <Card key={i} className="animate-pulse">
+                <CardHeader className="pb-2">
+                  <div className="h-4 bg-muted rounded w-24" />
+                </CardHeader>
+                <CardContent>
+                  <div className="h-8 bg-muted rounded w-20" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : !error && revenue ? (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <Card className="hover:shadow-lg transition-shadow duration-200 border-2">
               <CardHeader className="pb-2">
                 <CardDescription>Total Revenue</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">${revenue.totalRevenue}</div>
+                <div className="text-3xl font-bold text-primary">${revenue?.totalRevenue || 0}</div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow duration-200 border-2">
               <CardHeader className="pb-2">
                 <CardDescription>Paid Purchases</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{revenue.paidPurchases}</div>
+                <div className="text-3xl font-bold text-green-600">{revenue?.paidPurchases || 0}</div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow duration-200 border-2">
               <CardHeader className="pb-2">
                 <CardDescription>Pending</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{revenue.pendingPurchases}</div>
+                <div className="text-3xl font-bold text-yellow-600">{revenue?.pendingPurchases || 0}</div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="hover:shadow-lg transition-shadow duration-200 border-2">
               <CardHeader className="pb-2">
                 <CardDescription>Cancelled</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{revenue.cancelledPurchases}</div>
+                <div className="text-3xl font-bold text-red-600">{revenue?.cancelledPurchases || 0}</div>
               </CardContent>
             </Card>
           </div>
-        )}
+        ) : null}
 
         {/* Quick Links */}
         <div>
@@ -127,7 +150,7 @@ export default function AdminDashboardPage() {
               const Icon = link.icon;
               return (
                 <Link key={link.href} href={link.href}>
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+                  <Card className="hover:shadow-xl hover:border-primary/50 transition-all duration-200 cursor-pointer h-full border-2">
                     <CardHeader>
                       <Icon className="h-10 w-10 mb-2 text-primary" />
                       <CardTitle>{link.title}</CardTitle>

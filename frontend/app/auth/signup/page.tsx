@@ -43,20 +43,22 @@ export default function SignupPage() {
       <MainLayout>
         <div className="container px-4 py-20">
           <div className="mx-auto max-w-md">
-            <Card>
+            <Card className="shadow-lg border-2 border-primary/20">
               <CardHeader>
-                <CardTitle>Check Your Email</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-2xl text-center">Check Your Email</CardTitle>
+                <CardDescription className="text-center">
                   We&apos;ve sent a verification link to your email address.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Please check your inbox and click the verification link to complete your registration.
-                  The link will expire in 5 minutes.
-                </p>
+                <div className="bg-primary/10 p-4 rounded-md">
+                  <p className="text-sm text-muted-foreground">
+                    Please check your inbox and click the verification link to complete your registration.
+                    The link will expire in 5 minutes.
+                  </p>
+                </div>
                 <Link href="/auth/login">
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full hover:shadow-md transition-shadow">
                     Back to Login
                   </Button>
                 </Link>
@@ -72,9 +74,9 @@ export default function SignupPage() {
     <MainLayout>
       <div className="container px-4 py-20">
         <div className="mx-auto max-w-md">
-          <Card>
-            <CardHeader>
-              <CardTitle>Sign Up</CardTitle>
+          <Card className="shadow-lg border-2">
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-2xl">Sign Up</CardTitle>
               <CardDescription>
                 Create a new account to get started
               </CardDescription>
@@ -82,7 +84,7 @@ export default function SignupPage() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 {error && (
-                  <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm">
+                  <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium">
                     {error}
                   </div>
                 )}
@@ -157,7 +159,7 @@ export default function SignupPage() {
                   />
                 </div>
 
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full shadow-md hover:shadow-lg transition-shadow" disabled={loading}>
                   {loading ? 'Creating Account...' : 'Sign Up'}
                 </Button>
 

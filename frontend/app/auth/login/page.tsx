@@ -46,9 +46,9 @@ export default function LoginPage() {
     <MainLayout>
       <div className="container px-4 py-20">
         <div className="mx-auto max-w-md">
-          <Card>
-            <CardHeader>
-              <CardTitle>Login</CardTitle>
+          <Card className="shadow-lg border-2">
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-2xl">Login</CardTitle>
               <CardDescription>
                 Enter your credentials to access your account
               </CardDescription>
@@ -56,7 +56,7 @@ export default function LoginPage() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 {error && (
-                  <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm">
+                  <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium">
                     {error}
                   </div>
                 )}
@@ -95,7 +95,7 @@ export default function LoginPage() {
                   </Link>
                 </div>
 
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full shadow-md hover:shadow-lg transition-shadow" disabled={loading}>
                   {loading ? 'Logging in...' : 'Login'}
                 </Button>
 
